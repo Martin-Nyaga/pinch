@@ -1,0 +1,11 @@
+{
+  "name": "pinch",
+  "version": "1.0.0",
+  "description": "A simple algorithm for preliminary PINCH analysis",
+  "main": "-",
+  "scripts": {
+    "test": "-"
+  },
+  "author": "Martin Nyaga",
+  "license": "MIT"
+}

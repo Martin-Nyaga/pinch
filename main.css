@@ -1,0 +1,27 @@
+body {
+  font-family: serif;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 5px;
+}
+
+td input {
+  display: table-cell;
+  border: none;
+  height: 100%;
+}
+
+input {
+  font-family: serif;
+  font-size: 14px;
+}
+
+td input:focus {
+  outline: none; 
+}

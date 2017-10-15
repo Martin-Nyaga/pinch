@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel='stylesheet' href='main.css'>
+  </head>
+  <body>
+    <h4>
+      Stream Definitions
+    </h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Stream No.</th>
+          <th>Stream type</th>
+          <th><em>CP = mC<sub>p</sub></em> (kW&middot;K<sup>-1</sup>)</th>
+          <th><em>T<sub>s</sub></em> (&deg;C)</th>
+          <th><em>T<sub>t</sub></em> (&deg;C)</th>
+          <th><em>Q</em> (kW)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody data-bind='foreach: streams'>
+        <tr>
+          <td>
+            <span data-bind='text: id'></span>
+          </td>
+          <td>
+            <span data-bind='text: type'></span>
+          </td>
+          <td>
+            <input type='number' data-bind='textInput: _CP'>
+          </td>
+          <td>
+            <input type='number' data-bind='textInput: _supplyTemp'>
+          </td>
+          <td>
+            <input type='number' data-bind='textInput: _targetTemp'>
+          </td>
+          <td>
+            <span data-bind='text: heatLoad'></span>
+          </td>
+          <td>
+            <button data-bind='click: remove'>Remove</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <button data-bind='click: addStream'>Add Stream</button>
+    </p>
+
+    <h4>
+      Minimum Approach temperature
+    </h4>
+    <p>
+      Limits:
+      <em>
+        0 &le; &Delta; T<sub>min</sub> &le;
+        <span data-bind='text: maxDT'></span>
+      </em>
+    </p>
+    <p>
+      Select &Delta;T<sub>min</sub> value:
+      <input type='number' data-bind='textInput: _DTMin'>
+    </p>
+
+    <h4>
+      Intervals
+    </h4>
+    <p>
+      <button data-bind='click: calculateIntervals'>
+        Calculate Intervals
+      </button>
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Interval</th>
+        </tr>
+      </thead>
+      <tbody data-bind='foreach: intervals'>
+        <tr>
+          <td data-bind='text: upperTemp'></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>References</h4>
+    <p>
+      (max dtmin value - get reference)<br>
+      - Heat loads are shown as positive for coldstreams and negative for hot streams
+      as per coulson & richardson <br>
+      (Chemical engineering design - coulson & Richardson)
+    </p>
+
+    <script type='text/javascript' src='node_modules/knockout/build/output/knockout-latest.js'></script>
+    <script type='text/javascript' src='pinch.js'></script>
+  </body>
+</html>
