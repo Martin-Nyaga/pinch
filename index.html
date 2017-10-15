@@ -4,9 +4,9 @@
     <link rel='stylesheet' href='main.css'>
   </head>
   <body>
-    <h4>
+    <h3>
       Stream Definitions
-    </h4>
+    </h3>
     <table>
       <thead>
         <tr>
@@ -48,10 +48,14 @@
     <p>
       <button data-bind='click: addStream'>Add Stream</button>
     </p>
+    <p>
+      Q<sub>net</sub>: <strong data-bind='text: netHeatLoad'></strong>
+      <strong>kW</strong>
+    </p>
 
-    <h4>
+    <h3>
       Minimum Approach temperature
-    </h4>
+    </h3>
     <p>
       Limits:
       <em>
@@ -64,9 +68,9 @@
       <input type='number' data-bind='textInput: _DTMin'>
     </p>
 
-    <h4>
+    <h3>
       Intervals
-    </h4>
+    </h3>
     <p>
       <button data-bind='click: calculateIntervals'>
         Calculate Intervals
@@ -77,19 +81,52 @@
       <thead>
         <tr>
           <th>Interval</th>
+          <th>Temp. Range (Hot Side) (&deg;C)</th>
+          <th>Temp. Range (Cold Side) (&deg;C)</th>
+          <th>&Delta;T (&deg;C)</th>
+          <th>Streams</th>
+          <th>Q<sub>net</sub> (kW)</th>
+          <th>Surplus or Deficit?</th>
         </tr>
       </thead>
       <tbody data-bind='foreach: intervals'>
         <tr>
-          <td data-bind='text: upperTemp'></td>
+          <td data-bind='text: index'></td>
+          <td data-bind='text: hotSideTempRange()'></td>
+          <td data-bind='text: coldSideTempRange()'></td>
+          <td data-bind='text: DT()'></td> 
+          <td data-bind='text: streamIds().join(", ")'></td>
+          <td data-bind='text: netHeatLoad()'></td>
+          <td>
+            <strong data-bind='text: surplusOrDeficit()'></strong>
+          </td>
         </tr>
       </tbody>
     </table>
 
-    <h4>References</h4>
+    <p>
+      Overall Q<sub>net</sub>:
+      <strong data-bind='text: netHeatLoad'></strong>
+      <strong>kW</strong>
+      <br>
+      Minimum Heating Utility:
+      <strong data-bind='text: minHeatingUtility'></strong>
+      <strong>kW</strong>
+      <br>
+      Minimum Cooling Utility:
+      <strong data-bind='text: minCoolingUtility'></strong>
+      <strong>kW</strong>
+      <br>
+      Pinch Temperature:
+      <strong data-bind='text: pinchTemperature'></strong>
+      <strong>&deg;C</strong>
+      <br>
+    </p>
+
+    <h3>References</h3>
     <p>
       (max dtmin value - get reference)<br>
-      - Heat loads are shown as positive for coldstreams and negative for hot streams
+      - Heat loads are shown as positive for heat to be added and negative for heat to be removed
       as per coulson & richardson <br>
       (Chemical engineering design - coulson & Richardson)
     </p>
