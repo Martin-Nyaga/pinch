@@ -145,7 +145,7 @@ let PinchViewModel = function () {
   self.pinchTemperature = ko.observable();
   // Generate minimum cooling & heating utilities
   self.calculateUtilities = function () {
-    let heatingUtil = 0;
+    let heatingUtil = self.intervals()[0].netHeatLoad();
     // Get heating util as largest deficit
     self.intervals().slice(1).reduce((prevInterval, i) => {
       let util = i.netHeatLoad() + prevInterval;
