@@ -106,6 +106,7 @@ let PinchViewModel = function () {
   self.intervals = ko.observableArray();
   // Generate temperature intervals & heat loads
   self.calculateIntervals = function () {
+    if (self.streams().length < 2 || isNaN(self.DTMin())) return;
     // clear intervals
     self.intervals([]);
 
@@ -120,10 +121,6 @@ let PinchViewModel = function () {
       arr.push(s.targetTemp());
       return arr
     }, []);
-    console.log('cold');
-    console.log(coldStreamTemps);
-    console.log('Hot');
-    console.log(hotStreamTemps);
 
     let temps = Array.from(
         new Set(
@@ -140,7 +137,7 @@ let PinchViewModel = function () {
         )
       }
     });
-    self.calculateUtilities();
+    if (self.intervals().length > 1) self.calculateUtilities();
   }
 
   self.minHeatingUtility = ko.observable();
@@ -171,6 +168,7 @@ let PinchViewModel = function () {
   }
 
   self.load2StreamProblem = function () {
+    self.streams([]);
     self.addStream();
     self.addStream();
     let s1 = self.streams()[0];
@@ -183,6 +181,7 @@ let PinchViewModel = function () {
     s2._CP(20);
   }
   self.load4StreamProblem = function () {
+    self.streams([]);
     self.addStream();
     self.addStream();
     self.addStream();
@@ -208,7 +207,7 @@ let PinchViewModel = function () {
 
 let vm = new PinchViewModel();
 ko.applyBindings(vm);
-vm.load4StreamProblem();
+vm.load2StreamProblem();
 
 // Convert a number to roman numerals
 function romanize (num) {

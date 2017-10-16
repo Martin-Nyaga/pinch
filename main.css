@@ -1,5 +1,19 @@
 body {
   font-family: serif;
+  line-height: 1.45em;
+}
+
+.text-center {
+  text-align: center;
+}
+.highlight-green {
+  background: rgba(0,255,0,0.2);
+}
+
+div.main {
+  margin: 50px auto; 
+  max-width: 600px;
+  min-width: 400px;
 }
 
 table, th, td {
@@ -18,8 +32,17 @@ td input {
 }
 
 input {
-  font-family: serif;
-  font-size: 14px;
+  font-family: inherit;
+  font-size: 16px;
+  border: none;
+  background: none;
+  padding: 5px;
+  width: 100px;
+}
+
+input.bordered {
+  border: 1px solid black;
+  padding: 10px;
 }
 
 td input:focus {

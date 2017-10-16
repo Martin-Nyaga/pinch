@@ -4,134 +4,231 @@
     <link rel='stylesheet' href='main.css'>
   </head>
   <body>
-    <h3>
-      Stream Definitions
-    </h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Stream No.</th>
-          <th>Stream type</th>
-          <th><em>CP = mC<sub>p</sub></em> (kW&middot;K<sup>-1</sup>)</th>
-          <th><em>T<sub>s</sub></em> (&deg;C)</th>
-          <th><em>T<sub>t</sub></em> (&deg;C)</th>
-          <th><em>Q</em> (kW)</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody data-bind='foreach: streams'>
-        <tr>
-          <td>
-            <span data-bind='text: id'></span>
-          </td>
-          <td>
-            <span data-bind='text: type'></span>
-          </td>
-          <td>
-            <input type='number' data-bind='textInput: _CP'>
-          </td>
-          <td>
-            <input type='number' data-bind='textInput: _supplyTemp'>
-          </td>
-          <td>
-            <input type='number' data-bind='textInput: _targetTemp'>
-          </td>
-          <td>
-            <span data-bind='text: heatLoad'></span>
-          </td>
-          <td>
-            <button data-bind='click: remove'>Remove</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p>
-      <button data-bind='click: addStream'>Add Stream</button>
-    </p>
-    <p>
-      Q<sub>net</sub>: <strong data-bind='text: netHeatLoad'></strong>
-      <strong>kW</strong>
-    </p>
+    <div class='main'>
+      <h1 class='text-center'>
+        A Simple Toolkit for Pinch Analysis
+      </h1>
+      <h2 class='text-center'>
+        Martin Nyaga
+      </h2>
+      <h3 class='text-center'>
+        Bachelor of Engineering,<br>
+        Chemical & Process Engineering,<br>
+        University of Leeds
+      </h3>
+      <h3 class='text-center'>
+        Last Updated: October 2017
+      </h3>
+      <h2>
+        Introduction
+      </h2>
+      <p>
+        The efficient utilisation of energy in industrial processes is
+        an important aspect of chemical engineering design. Process engineers are typically
+        concerned with the design and optimization of heat exhchanger networks in 
+        order to achieve maximum energy recovery. Pinch techniques assist
+        design engineers in setting energy targets, as well as 
+        identifying possible exchanger layouts and evaluating their performance 
+        aganist cost constraints (Kemp, 2007).
+      </p>
+      <p>
+        Once the pinch temperature in a system is identified,
+        exchanger layouts can be designed such that heat is only
+        added into the system above the pinch point, removed from the system
+        below the pinch point, and never transferred across the pinch.
+        It has been shown that if the thermodynamic break
+        represented by the pinch temperature is complied with, the resulting design
+        will minimize energy requirements (Sinnot & Towler, 2009).
+      </p>
+      <p>
+        A simple toolkit is presented below, capable of determining the
+        pinch temperature and minimum utility requirements in typical
+        undergraduate-level multi-stream design problems.
+      </p>
+      <h2>About this Tool</h2>
+      <p>
+        The methods implemented in this tool are informed primarily by my own
+        university lectures and coursework in pinch analysis, combined with
+        further reading from the references listed below.
+        Heat loads are shown as positive values for a heat deficit and
+        negative for heat surplus following Sinnot & Towler (2009).
+      </p>
+      <p>
+        All the source code is available under an MIT License
+        <a href='https://github.com/Martin-Nyaga/pinch'>on GitHub</a>.
+        The algorithms have been written in Javascript, using KnockoutJs 
+        for UI components.
+      </p>
+      <h3>Usage</h3>
+      <p>
+        This tool can be used by following the topics on this page, and providing the
+        necessary inputs (highlighted in green). The final results can be found towards
+        the bottom of the page.
+      </p>
+      <h2>
+        Stream Definitions
+      </h2>
+      <p>
+        Define your streams in the table below.
+      </p>
+      <p>
+        <button data-bind='click: load2StreamProblem'>Load a sample 2 stream problem</button>
+        <button data-bind='click: load4StreamProblem'>Load a sample 4 stream problem</button>
+      <table>
+        <thead>
+          <tr>
+            <th>Stream No.</th>
+            <th>Stream type</th>
+            <th><em>CP = mC<sub>p</sub></em> (kW&middot;K<sup>-1</sup>)</th>
+            <th><em>T<sub>s</sub></em> (&deg;C)</th>
+            <th><em>T<sub>t</sub></em> (&deg;C)</th>
+            <th><em>Q</em> (kW)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody data-bind='foreach: streams'>
+          <tr>
+            <td>
+              <span data-bind='text: id'></span>
+            </td>
+            <td>
+              <span data-bind='text: type'></span>
+            </td>
+            <td class='highlight-green'>
+              <input type='number' data-bind='textInput: _CP'>
+            </td>
+            <td class='highlight-green'>
+              <input type='number' data-bind='textInput: _supplyTemp'>
+            </td>
+            <td class='highlight-green'>
+              <input type='number' data-bind='textInput: _targetTemp'>
+            </td>
+            <td>
+              <span data-bind='text: heatLoad'></span>
+            </td>
+            <td>
+              <button data-bind='click: remove'>Remove</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <button data-bind='click: addStream'>Add Stream</button>
+      </p>
+      <p>
+        Q<sub>net</sub>: <strong data-bind='text: netHeatLoad'></strong>
+        <strong>kW</strong>
+      </p>
 
-    <h3>
-      Minimum Approach temperature
-    </h3>
-    <p>
-      Limits:
-      <em>
-        0 &le; &Delta; T<sub>min</sub> &le;
-        <span data-bind='text: maxDT'></span>
-      </em>
-    </p>
-    <p>
-      Select &Delta;T<sub>min</sub> value:
-      <input type='number' data-bind='textInput: _DTMin'>
-    </p>
+      <h2>
+        Minimum Approach temperature
+      </h2>
+      <p>
+        Limits:
+        <em>
+          0 &le; &Delta; T<sub>min</sub> &le;
+          <span data-bind='text: maxDT'></span>
+        </em>
+      </p>
+      <p>
+        Select &Delta;T<sub>min</sub> value:
+        <input class='highlight-green bordered' type='number' data-bind='textInput: _DTMin'>
+      </p>
 
-    <h3>
-      Intervals
-    </h3>
-    <p>
-      <button data-bind='click: calculateIntervals'>
-        Calculate Intervals
-      </button>
-    </p>
+      <h2>
+        Intervals
+      </h2>
+      <p>
+        With all the inputs above correctly filled in, click
+        "Calculate Intervals" below to compute the results.
+      </p>
+      <p>
+        <button data-bind='click: calculateIntervals'>
+          Calculate Intervals
+        </button>
+      </p>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Interval</th>
-          <th>Temp. Range (Hot Side) (&deg;C)</th>
-          <th>Temp. Range (Cold Side) (&deg;C)</th>
-          <th>&Delta;T (&deg;C)</th>
-          <th>Streams</th>
-          <th>Q<sub>net</sub> (kW)</th>
-          <th>Surplus or Deficit?</th>
-        </tr>
-      </thead>
-      <tbody data-bind='foreach: intervals'>
-        <tr>
-          <td data-bind='text: index'></td>
-          <td data-bind='text: hotSideTempRange()'></td>
-          <td data-bind='text: coldSideTempRange()'></td>
-          <td data-bind='text: DT()'></td> 
-          <td data-bind='text: streamIds().join(", ")'></td>
-          <td data-bind='text: netHeatLoad()'></td>
-          <td>
-            <strong data-bind='text: surplusOrDeficit()'></strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Interval</th>
+            <th>Temp. Range (Hot Side) (&deg;C)</th>
+            <th>Temp. Range (Cold Side) (&deg;C)</th>
+            <th>&Delta;T (&deg;C)</th>
+            <th>Streams</th>
+            <th>Q<sub>net</sub> (kW)</th>
+            <th>Surplus or Deficit?</th>
+          </tr>
+        </thead>
+        <tbody data-bind='foreach: intervals'>
+          <tr>
+            <td data-bind='text: index'></td>
+            <td data-bind='text: hotSideTempRange()'></td>
+            <td data-bind='text: coldSideTempRange()'></td>
+            <td data-bind='text: DT()'></td> 
+            <td data-bind='text: streamIds().join(", ")'></td>
+            <td data-bind='text: netHeatLoad()'></td>
+            <td>
+              <strong data-bind='text: surplusOrDeficit()'></strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <p>
-      Overall Q<sub>net</sub>:
-      <strong data-bind='text: netHeatLoad'></strong>
-      <strong>kW</strong>
-      <br>
-      Minimum Heating Utility:
-      <strong data-bind='text: minHeatingUtility'></strong>
-      <strong>kW</strong>
-      <br>
-      Minimum Cooling Utility:
-      <strong data-bind='text: minCoolingUtility'></strong>
-      <strong>kW</strong>
-      <br>
-      Pinch Temperature:
-      <strong data-bind='text: pinchTemperature'></strong>
-      <strong>&deg;C</strong>
-      <br>
-    </p>
+      <h2>
+        Results
+      </h2>
+      <p>
+        Overall Q<sub>net</sub>:
+        <strong data-bind='text: netHeatLoad'></strong>
+        <strong>kW</strong>
+        <br>
+        Minimum Heating Utility:
+        <strong data-bind='text: minHeatingUtility'></strong>
+        <strong>kW</strong>
+        <br>
+        Minimum Cooling Utility:
+        <strong data-bind='text: minCoolingUtility'></strong>
+        <strong>kW</strong>
+        <br>
+        Pinch Temperature:
+        <strong data-bind='text: pinchTemperature'></strong>
+        <strong>&deg;C</strong>
+        <br>
+      </p>
 
-    <h3>References</h3>
-    <p>
-      (max dtmin value - get reference)<br>
-      - Heat loads are shown as positive for heat to be added and negative for heat to be removed
-      as per coulson & richardson <br>
-      (Chemical engineering design - coulson & Richardson)
-    </p>
+      <h2>
+        Further Work
+      </h2>
+      <p>
+        As time will allow, I hope to improve this tool further to include:
+      </p>
+      <ol>
+        <li>Visualisation of cascade diagrams</li>
+        <li>Plotting of composite curves</li>
+        <li>Minimum utility vs &Delta;T<sub>min</sub> curves
+        <li>Importing and exporting of stream data/results for complex streams</li>
+      </ol>
 
-    <script type='text/javascript' src='node_modules/knockout/build/output/knockout-latest.js'></script>
-    <script type='text/javascript' src='pinch.js'></script>
+      <h2>References</h2>
+      <p>
+        Kemp, I. 2007. <em>Pinch Analysis and Process Integration.</em>
+        Second Edition. Oxford: Elsevier Ltd.
+      </p>
+      <p>
+        Sinnot, R. and Towler, G. 2009. <em>Chemical Engineering Design.</em>
+        Fifth Edition. Oxford: Elsevier Ltd.
+      </p>
+      <p>
+        Bagajewicz, Miguel J. 2005. Heat Integration. 
+        <em>Pan American Advanced Studies Institute Program
+        on Process Systems Engineering. August 16-25, 2005, Iguazu Falls.</em>
+        [Online][Accessed 16 October 2017] Available from 
+        <a href='http://cepac.cheme.cmu.edu/pasilectures/bagajewicz/BagajewiczHeatIntegration.pdf' target=_blank>URL</a>.
+      </p>
+        
+      <script type='text/javascript' src='node_modules/knockout/build/output/knockout-latest.js'></script>
+      <script type='text/javascript' src='pinch.js'></script>
+    </div>
   </body>
 </html>
