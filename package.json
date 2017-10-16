@@ -1,7 +1,7 @@
 {
   "name": "pinch",
   "version": "1.0.0",
-  "description": "A simple algorithm for preliminary PINCH analysis",
+  "description": "A Simple Toolkit for Pinch Analysis",
   "main": "-",
   "scripts": {
     "test": "-"
