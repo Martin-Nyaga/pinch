@@ -48,3 +48,8 @@ input.bordered {
 td input:focus {
   outline: none; 
 }
+
+div.chart {
+  width: 100%;
+  height: 500px;
+}

@@ -1,4 +1,3 @@
-
 let Stream = function (vm, id) {
   let self = this;
   self.parent = vm;
@@ -45,16 +44,20 @@ let Interval = function (vm, index, upperTemp, lowerTemp) {
   }
   self.DT = () => self.hotSideUpperTemp - self.hotSideLowerTemp;
 
-  self.streams = function () {
-    let hotStreams = self.parent.hotStreams().filter(s => {
+  self.hotStreams = function () {
+    return self.parent.hotStreams().filter(s => {
       return s.supplyTemp() >= self.hotSideUpperTemp &&
              s.targetTemp() <= self.hotSideLowerTemp
     })
-    let coldStreams = self.parent.coldStreams().filter(s => {
+  }
+  self.coldStreams = function () {
+    return self.parent.coldStreams().filter(s => {
       return s.supplyTemp() <= self.coldSideLowerTemp &&
              s.targetTemp() >= self.coldSideUpperTemp
     })
-    return hotStreams.concat(coldStreams);
+  }
+  self.streams = function () {
+    return self.hotStreams().concat(self.coldStreams());
   }
   self.streamIds = () => self.streams().map(s => s.id);
 
@@ -104,6 +107,13 @@ let PinchViewModel = function () {
   self.DTMin = ko.computed(() => parseFloat(self._DTMin()));
 
   self.intervals = ko.observableArray();
+
+  self.calculate = function () {
+    self.calculateIntervals()
+    if (self.intervals().length > 1) self.calculateUtilities();
+    self.plotCompositeCurves()
+  }
+
   // Generate temperature intervals & heat loads
   self.calculateIntervals = function () {
     if (self.streams().length < 2 || isNaN(self.DTMin())) return;
@@ -137,34 +147,143 @@ let PinchViewModel = function () {
         )
       }
     });
-    if (self.intervals().length > 1) self.calculateUtilities();
   }
 
   self.minHeatingUtility = ko.observable();
   self.minCoolingUtility = ko.observable();
   self.pinchTemperature = ko.observable();
+
   // Generate minimum cooling & heating utilities
+  // Also calculates pinch temperature
   self.calculateUtilities = function () {
     let heatingUtil = self.intervals()[0].netHeatLoad();
     // Get heating util as largest deficit
     self.intervals().slice(1).reduce((prevInterval, i) => {
-      let util = i.netHeatLoad() + prevInterval;
-      if (util > heatingUtil) heatingUtil = util;
-      return util;
-    }, self.intervals()[0].netHeatLoad());
+      let util = i.netHeatLoad() + prevInterval
+      if (util > heatingUtil) heatingUtil = util
+      return util
+    }, self.intervals()[0].netHeatLoad())
 
     // Get cooling util as surplus after heating util is included
     let coolingUtil = -self.intervals().reduce((prevInterval, i) => {
       if (prevInterval == 0) {
         self.pinchTemperature(
           (i.hotSideUpperTemp + i.coldSideUpperTemp) / 2
-        );
+        )
       }
       return prevInterval + i.netHeatLoad();
-    }, -heatingUtil);
+    }, -heatingUtil)
 
     self.minHeatingUtility(heatingUtil);
     self.minCoolingUtility(coolingUtil);
+  }
+
+  // Calculate composite curve data
+  self.compositeCurveData = function () {
+    let intervals = self.intervals().reverse()
+    let hotStreamsData = []
+    let prevT = intervals[0].hotSideLowerTemp
+    let prevQ = 0
+    hotStreamsData.push([prevQ, prevT])
+    intervals.forEach(i => {
+      if (i.hotStreams().length == 0) return
+      let t = i.hotSideUpperTemp
+      let qInterval =
+        i.hotStreams()
+         .reduce((q, s) => q + s.CP() * (t - prevT), prevQ)
+      hotStreamsData.push([ qInterval, t ])
+      prevT = t
+      prevQ = qInterval
+    })
+
+    let coldStreamsData = []
+    intervals = self.intervals()
+    prevT = intervals[0].coldSideLowerTemp
+    prevQ = self.minCoolingUtility()
+    coldStreamsData.push([ prevQ, prevT ])
+    intervals.forEach(i => {
+      if (i.coldStreams().length == 0) return
+      let t = i.coldSideUpperTemp
+      let qInterval =
+        i.coldStreams()
+         .reduce((q, s) => q + s.CP() * (t - prevT), prevQ)
+      coldStreamsData.push([ qInterval, t ])
+      prevT = t
+      prevQ = qInterval
+    })
+
+    let hotPinchTemp = self.pinchTemperature() + (self.DTMin()/2)
+    let pinchEnthalpy =
+      hotStreamsData.filter(r => r[1] == hotPinchTemp)[0][0]
+
+    return {
+      hot: hotStreamsData,
+      cold: coldStreamsData,
+      pinchEnthalpy: pinchEnthalpy
+    }
+  }
+
+  // Use Highcharts to plot composite curves
+  self.plotCompositeCurves = function () {
+    let data = self.compositeCurveData()
+    let chart =
+      Highcharts.chart('compositeCurve', {
+        chart: {
+          type: 'line'
+        },
+        title: {
+          text: 'Composite Curves'
+        },
+        xAxis: {
+          title: {
+            text: 'Enthalpy, Q (kW)'
+          }
+        },
+        yAxis: {
+          title: {
+            text: 'Temperature, T (&deg;C)',
+            useHTML: true
+          }
+        },
+        tooltip: {
+          formatter: function () {
+            return `<b>${this.series.name}</b><br>` +
+                   `<b>T:</b> ${this.y} &deg;C<br>` +
+                   `<b>Q:</b> ${this.x} kW`
+          },
+          useHTML: true
+        },
+        series: [
+          {
+            id: 'Hot',
+            name: 'Hot',
+            data: data.hot,
+            color: 'red',
+            marker: {
+              enabled: true
+            }
+          },
+          {
+            id: 'Cold',
+            name: 'Cold',
+            data: data.cold,
+            color: 'blue',
+            marker: {
+              enabled: true
+            }
+          }
+        ]
+      })
+
+    chart.xAxis[0].addPlotLine({
+      color: '#00ff00',
+      dashStyle: 'longDashDot',
+      value: data.pinchEnthalpy,
+      label: {
+        text: 'Pinch Point'
+      },
+      width: 2
+    })
   }
 
   self.load2StreamProblem = function () {
@@ -207,7 +326,7 @@ let PinchViewModel = function () {
 
 let vm = new PinchViewModel();
 ko.applyBindings(vm);
-vm.load2StreamProblem();
+vm.load4StreamProblem();
 
 // Convert a number to roman numerals
 function romanize (num) {
